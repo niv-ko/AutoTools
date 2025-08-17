@@ -11,5 +11,4 @@ class Parameter(BaseModel):
 
     name: str
     description: str
-    # Python type annotation to use for this parameter in ToolCall models (e.g., int, str, bool)
     annotation: TypeLike

@@ -1,7 +1,7 @@
 import re
 from typing import TypeVar, Generic, Type
 
-from endpoint_configs.base import EndpointConfig
+from endpoint_configs.schema import EndpointConfig
 from extraction_configs.schema import ExtractionConfig
 
 from pydantic import create_model, Field

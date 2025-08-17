@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from endpoint_configs.base import EndpointConfig
+from endpoint_configs.schema import EndpointConfig
 from parameters.parameter import Parameter
 
 example_config = EndpointConfig(
