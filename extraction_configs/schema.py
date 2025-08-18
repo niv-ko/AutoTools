@@ -17,5 +17,5 @@ class ParameterRequirement(BaseModel):
 
 
 class ExtractionConfig(BaseModel):
-    parameter_extraction_methods: list[ExtractionMethod]
+    parameter_extraction_methods: list[ParameterExtractionMethod]
     parameters_requirements: list[ParameterRequirement] = Field(default_factory=list)

@@ -1,9 +1,14 @@
-from typing import Type
+from types import GenericAlias, UnionType
+from typing import ForwardRef
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+from pydantic.config import ConfigDict
+
+TypeLike = type | GenericAlias | UnionType | ForwardRef
 
 
 class Parameter(BaseModel):
+
     name: str
     description: str
-    type: BaseModel
+    annotation: TypeLike
