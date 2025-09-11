@@ -31,6 +31,9 @@ class EndpointConfig(BaseModel):
         except KeyError:
             raise KeyError(f"Parameter '{name}' not found in endpoint '{self.name}'.") from None
 
+    def get_params_by_names(self, names: list[str]) -> list[Parameter]:
+        return [self.get_param_by_name(name) for name in names]
+
     @property
     def endpoint_schema(self) -> Type[BaseModel]:
         fields = dict()

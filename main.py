@@ -4,7 +4,7 @@ from fastapi import FastAPI, APIRouter
 from fastapi.responses import JSONResponse
 
 from endpoint_configs.load import load_endpoint_configs
-from tool_handler.tool_handler import ToolHandler
+from tool_handler.base import ToolHandler
 from extraction_configs.schema import ExtractionConfig
 
 
