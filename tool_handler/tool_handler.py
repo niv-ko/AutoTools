@@ -1,10 +1,11 @@
 import re
 from typing import TypeVar, Generic, Type
 
+from pydantic import create_model, Field
+
+from consts import TOOL_CALL_MODEL_NAME_PREFIX
 from endpoint_configs.schema import EndpointConfig
 from extraction_configs.schema import ExtractionConfig
-
-from pydantic import create_model, Field
 from tool_handler.tool_call import ToolCall
 
 ToolCallType = TypeVar("ToolCallType", bound=ToolCall)
@@ -20,9 +21,7 @@ class ToolHandler(Generic[ToolCallType]):
         pass
 
     def create_tool_call(self) -> Type[ToolCallType]:
-        fields = {
-            "query": (str, Field(..., description="The user query")),
-        }
+        fields = dict()
 
         for p in self.endpoint_config.parameters:
             field_name = _sanitize(p.name)
@@ -35,9 +34,9 @@ class ToolHandler(Generic[ToolCallType]):
                 ),
             )
 
-        model_name = f"ToolCall_{self.endpoint_config.name}"
+        model_name = f"{TOOL_CALL_MODEL_NAME_PREFIX}{self.endpoint_config.name}"
 
-        model = create_model(  # type: ignore
+        model = create_model(
             model_name,
             __config__=None,
             __base__=ToolCall,

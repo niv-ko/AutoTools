@@ -1,0 +1,5 @@
+QUERY_FIELD_NAME = "query"
+QUERY_FIELD_DESCRIPTION = "The user query"
+PARAMETERS_TO_EXTRACT_FIELD_NAME = "parameters_to_extract"
+PARAMETERS_TO_EXTRACT_FIELD_DESCRIPTION = "List of parameter names to extract, or None to extract all parameters"
+TOOL_CALL_MODEL_NAME_PREFIX = "ToolCall_"
