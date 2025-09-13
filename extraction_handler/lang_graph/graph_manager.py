@@ -6,7 +6,7 @@ from langgraph.graph.state import CompiledStateGraph
 from langgraph.runtime import Runtime
 from pydantic import BaseModel
 
-from endpoint_configs.schema import EndpointConfig
+from endpoint_configs.config_model import EndpointConfig
 from extraction_configs.schema import ExtractionConfig
 from extractor_factory.base import ExtractorFactory
 from extractors.base import Extractor

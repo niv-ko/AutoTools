@@ -1,13 +1,14 @@
 from __future__ import annotations
 from pydantic import BaseModel, TypeAdapter, ValidationError, model_validator
-from typing import Self, Any
+from typing import Self, Any, TypeVar, Generic
 
 from parameters.parameter import Parameter, TypeLike
 
+T = TypeVar("T")
 
-class ParameterExtraction(BaseModel):
-    parameter: Parameter
-    result: Any
+class ParameterExtraction(BaseModel, Generic[T]):
+    parameter: Parameter[T]
+    result: T | None
 
     @model_validator(mode='after')
     def validate_result_matches_parameter(self) -> ParameterExtraction:

@@ -1,4 +1,4 @@
-from endpoint_configs.schema import EndpointConfig
+from endpoint_configs.config_model import EndpointConfig
 from extraction_configs.registry import get_extraction_config
 from extraction_configs.schema import ExtractionConfig
 from tool_handler.base import ToolHandler

@@ -1,4 +1,4 @@
-from endpoint_configs.schema import EndpointConfig
+from endpoint_configs.config_model import EndpointConfig
 from extraction_configs.schema import ExtractionConfig
 from extractor_factory.base import ExtractorFactory
 from parameter_extraction.parameter_extraction import ParameterExtraction

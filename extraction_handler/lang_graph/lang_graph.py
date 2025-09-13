@@ -1,4 +1,4 @@
-from endpoint_configs.schema import EndpointConfig
+from endpoint_configs.config_model import EndpointConfig
 from extraction_configs.schema import ExtractionConfig
 from extraction_handler.base import ExtractionHandler
 from extraction_handler.lang_graph.graph_manager import LangGraphManager

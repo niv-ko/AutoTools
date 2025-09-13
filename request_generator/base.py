@@ -3,12 +3,13 @@ from typing import TypeVar, Generic
 
 from pydantic import BaseModel
 
+from endpoint_configs.schema import EndpointSchema
 from tool_handler.tool_response import HttpRequest
 
-TModel = TypeVar("TModel", bound=BaseModel)
+T = TypeVar("T", bound=EndpointSchema)
 
 
 @abstractmethod
-class RequestGenerator(ABC, Generic[TModel]):
-    def generate_request(self, extractions_schema: TModel) -> HttpRequest:
+class RequestGenerator(ABC, Generic[T]):
+    def generate_request(self, extractions_schema: T) -> HttpRequest:
         pass

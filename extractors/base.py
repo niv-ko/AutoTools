@@ -9,8 +9,8 @@ class Extractor:
         self.parameter_to_extract = parameter_to_extract
         self.kwargs = kwargs
 
-    def extract(self, required_extractions: list[ParameterExtraction], **kwargs) -> Any:
+    async def extract(self, required_extractions: list[ParameterExtraction], **kwargs) -> Any:
         raise NotImplementedError("Extractor.extract must be implemented in subclasses.")
 
-    def __call__(self, *args, **kwargs):
-        return self.extract(*args, **kwargs)
+    async def __call__(self, *args, **kwargs):
+        return await self.extract(*args, **kwargs)
