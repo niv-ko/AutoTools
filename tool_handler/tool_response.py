@@ -14,7 +14,7 @@ class HttpRequest(BaseModel):
     url: HttpUrl
     method: Literal['GET', 'POST', 'PUT', 'DELETE']
     params: dict[str, str] = Field(default_factory=dict)
-    headers: dict[str, str]
+    headers: dict[str, str] = Field(default_factory=dict)
     body: Optional[str] = None
 
 

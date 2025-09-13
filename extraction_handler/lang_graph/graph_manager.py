@@ -1,5 +1,5 @@
 from operator import add
-from typing import Callable, Annotated
+from typing import Callable, Annotated, TypeVar
 
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.state import CompiledStateGraph
@@ -13,6 +13,8 @@ from extractors.base import Extractor
 from parameter_extraction.parameter_extraction import ParameterExtraction
 from parameters.parameter import Parameter
 
+T = TypeVar('T')
+
 
 class LangGraphManager:
     def __init__(self, endpoint_config: EndpointConfig, extraction_config: ExtractionConfig,
@@ -22,31 +24,34 @@ class LangGraphManager:
         self.extractor_factory = extractor_factory
 
     def get_parameters_to_extract(self, requested: list[Parameter]) -> list[Parameter]:
-        params_to_extract: set[Parameter] = set()
+        params_to_extract: list[Parameter] = list()
         stack = list(requested)
         while stack:
             p = stack.pop()
             if p in params_to_extract:
                 continue
-            params_to_extract.add(p)
+            params_to_extract.append(p)
             requirements = self.extraction_config.get_required_parameters(p.name)
             stack.extend([self.endpoint_config.get_param_by_name(req) for req in requirements])
-        return list(params_to_extract)
+        return params_to_extract
 
     class State(BaseModel):
         extractions: Annotated[list[ParameterExtraction], add]
+
+        def is_extracted(self, parameter: Parameter) -> bool:
+            return any(pe.parameter.name == parameter.name for pe in self.extractions)
 
     class Context(BaseModel):
         parameters_to_extract: list[Parameter]
 
     def make_extraction_node(self, parameter: Parameter, extractor: Extractor):
         async def _node(state: LangGraphManager.State, runtime: Runtime[LangGraphManager.Context]):
-            if parameter not in runtime.context.parameters_to_extract or parameter in state.extractions:
+            if parameter not in runtime.context.parameters_to_extract or state.is_extracted(parameter):
                 return {}
             required_extractions = [e for e in state.extractions if e.parameter.name in
                                     self.extraction_config.get_required_parameters(parameter.name)]
             value = await extractor(required_extractions)
-            return {"extractions": [ParameterExtraction(parameter=parameter, result=value)]}
+            return {"extractions": [ParameterExtraction[parameter.param_type()](parameter=parameter, result=value)]}
 
         _node.__name__ = f"{parameter.name}_extractor_node"
         return _node

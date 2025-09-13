@@ -1,6 +1,7 @@
 from endpoint_configs.config_model import EndpointConfig
 from extraction_configs.registry import get_extraction_config
 from extraction_configs.schema import ExtractionConfig
+from extraction_handler.lang_graph.lang_graph import GraphExtractionHandler
 from tool_handler.base import ToolHandler
 
 
@@ -12,6 +13,7 @@ class ToolBuilder:
         tool_handlers = []
         for cfg in self.endpoint_configs:
             extraction_config = get_extraction_config(cfg.name)
-            handler = ToolHandler(cfg, extraction_config)
+            extraction_handler_cls = GraphExtractionHandler
+            handler = ToolHandler(cfg, extraction_config, extraction_handler_cls)
             tool_handlers.append(handler)
         return tool_handlers

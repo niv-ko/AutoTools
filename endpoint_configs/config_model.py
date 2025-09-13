@@ -1,12 +1,12 @@
 import re
-from pathlib import Path
 from typing import Type, TypeVar, Generic
 
-from pydantic import BaseModel, PrivateAttr, ConfigDict, Field, create_model
+from pydantic import BaseModel, PrivateAttr, ConfigDict, Field, create_model, HttpUrl
 from pydantic.fields import FieldInfo
+from pydantic_core import PydanticUndefined
 
 from endpoint_configs.schema import EndpointSchema
-from parameters.parameter import Parameter, TypeLike
+from parameters.parameter import Parameter, TypeLike, _NOT_GIVEN
 
 INPUT_SCHEMA_MODEL_NAME_SUFFIX = "_input_schema"
 OUTPUT_SCHEMA_MODEL_NAME_SUFFIX = "_schema"
@@ -22,7 +22,7 @@ class Unset(BaseModel):
 class EndpointConfig(BaseModel, Generic[S, T]):
     model_config = ConfigDict(extra="forbid", frozen=True)
     name: str
-    route: Path
+    route: HttpUrl
     description: str
     parameters: list[Parameter]
 
@@ -50,13 +50,11 @@ class EndpointConfig(BaseModel, Generic[S, T]):
         for p in self.parameters:
             field_name = _sanitize(p.name)
             if input_schema and not p.required_input:
-                annotation = Unset | p.annotation
-                default = Unset()
+                default = _NOT_GIVEN
             else:
-                annotation = p.annotation
-                default = p.default
+                default = p.default if p.default is not _NOT_GIVEN else ...
             fields[field_name] = (
-                annotation,
+                p.param_type(),
                 Field(
                     default,
                     description=p.description,

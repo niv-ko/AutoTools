@@ -14,4 +14,4 @@ class ToolCall(BaseModel, Generic[S]):
     query: Annotated[str, Field(..., description=QUERY_FIELD_DESCRIPTION)]
     parameters_to_extract: Annotated[Optional[list[str]], Field(
         default=None, description=PARAMETERS_TO_EXTRACT_FIELD_DESCRIPTION)]
-    supported_parameters: S
+    supported_parameters: Optional[S] = None

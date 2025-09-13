@@ -1,4 +1,4 @@
-from types import GenericAlias, UnionType
+from types import GenericAlias, UnionType, EllipsisType
 from typing import ForwardRef, Any, TypeVar, Generic, Type, get_args
 
 from pydantic import BaseModel
@@ -7,16 +7,18 @@ from pydantic.config import ConfigDict
 TypeLike = type | GenericAlias | UnionType | ForwardRef
 
 T = TypeVar("T")
-
+_NOT_GIVEN = object()
 
 class Parameter(BaseModel, Generic[T]):
     name: str
     description: str
     required_input: bool = False
-    default: T
+    # has_default: bool = False
+    default: T = _NOT_GIVEN
 
-    def param_type(self) -> TypeLike:
-        t = get_args(self.__class__)
-        if not t:
-            raise TypeError("Use a specialized generic, e.g. Parameter[int](...)")
-        return t[0]
+    @classmethod
+    def param_type(cls) -> Type[T]:
+        md = getattr(cls, "__pydantic_generic_metadata__", None)
+        if md and md.get("args"):
+            return md["args"][0]
+        raise TypeError(f"{cls.__name__} must be specialized, e.g. {cls.__name__}[int]")

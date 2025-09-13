@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, conlist
+from pydantic import BaseModel, Field, conlist, PrivateAttr
 
 
 class ExtractionMethod(BaseModel):
@@ -13,15 +13,15 @@ class ParameterExtractionMethod(BaseModel):
 
 class ParameterRequirement(BaseModel):
     parameter_name: str
-    required_parameters_names: conlist(str, min_length=1)
+    required_parameters_names: list[str] = Field(min_items=1)
 
 
 class ExtractionConfig(BaseModel):
     parameter_extraction_methods: list[ParameterExtractionMethod]
     parameters_requirements: list[ParameterRequirement] = Field(default_factory=list)
 
-    _method_by_name: dict[str, ExtractionMethod] = Field(default_factory=dict)
-    _requirements_by_name: dict[str, list[str]] = Field(default_factory=dict)
+    _method_by_name: dict[str, ExtractionMethod] = PrivateAttr(default_factory=dict)
+    _requirements_by_name: dict[str, list[str]] = PrivateAttr(default_factory=dict)
 
     def model_post_init(self, __context):
         # Build private indices for quick access
@@ -37,7 +37,4 @@ class ExtractionConfig(BaseModel):
             raise KeyError(f"Extraction method for parameter '{parameter_name}' not found.") from None
 
     def get_required_parameters(self, parameter_name: str) -> list[str]:
-        try:
-            return self._requirements_by_name[parameter_name]
-        except KeyError:
-            raise KeyError(f"Required parameters for '{parameter_name}' not found.") from None
+        return self._requirements_by_name.get(parameter_name, [])

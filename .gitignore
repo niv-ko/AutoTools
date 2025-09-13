@@ -3,3 +3,9 @@
 /__pycache__/
 .idea
 endpoint_configs/__pycache__/
+
+extraction_handler/lang_graph/__pycache__/
+
+*.pyc
+
+*.xml

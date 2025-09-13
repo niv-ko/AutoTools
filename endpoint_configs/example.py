@@ -1,14 +1,14 @@
-from pathlib import Path
+from pydantic import HttpUrl
 
 from endpoint_configs.config_model import EndpointConfig
 from parameters.parameter import Parameter
 
 example_config = EndpointConfig(
     name="example",
-    route=Path("/example"),
+    route=HttpUrl("http://localhost:8000/example"),
     description="An example endpoint that accepts two integers a and b.",
     parameters=[
-        Parameter(name='a', description="First integer", annotation=int),
-        Parameter(name='b', description="Second integer", annotation=int),
+        Parameter[int](name='a', description="First integer", required_input=False),
+        Parameter[int](name='b', description="Second integer", default=2),
     ]
 )
