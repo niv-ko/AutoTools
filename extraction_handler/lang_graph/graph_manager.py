@@ -1,5 +1,5 @@
 from operator import add
-from typing import Callable, Annotated, TypeVar
+from typing import Callable, Annotated, TypeVar, Optional
 
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.state import CompiledStateGraph
@@ -12,6 +12,7 @@ from extractor_factory.base import ExtractorFactory
 from extractors.base import Extractor
 from parameter_extraction.parameter_extraction import ParameterExtraction
 from parameters.parameter import Parameter
+from selector.base import ParameterSelector
 
 T = TypeVar('T')
 
@@ -23,7 +24,7 @@ class LangGraphManager:
         self.extraction_config = extraction_config
         self.extractor_factory = extractor_factory
 
-    def get_parameters_to_extract(self, requested: list[Parameter]) -> list[Parameter]:
+    async def get_parameters_to_extract(self, requested: list[Parameter]) -> list[Parameter]:
         params_to_extract: list[Parameter] = list()
         stack = list(requested)
         while stack:
@@ -42,6 +43,7 @@ class LangGraphManager:
             return any(pe.parameter.name == parameter.name for pe in self.extractions)
 
     class Context(BaseModel):
+        query: str
         parameters_to_extract: list[Parameter]
 
     def make_extraction_node(self, parameter: Parameter, extractor: Extractor):
@@ -50,7 +52,7 @@ class LangGraphManager:
                 return {}
             required_extractions = [e for e in state.extractions if e.parameter.name in
                                     self.extraction_config.get_required_parameters(parameter.name)]
-            value = await extractor(required_extractions)
+            value = await extractor(runtime.context.query, required_extractions)
             return {"extractions": [ParameterExtraction[parameter.param_type()](parameter=parameter, result=value)]}
 
         _node.__name__ = f"{parameter.name}_extractor_node"
@@ -78,11 +80,11 @@ class LangGraphManager:
 
         return g.compile()
 
-    async def run_graph(self, graph: CompiledStateGraph, requested: list[Parameter],
+    async def run_graph(self, query: str, graph: CompiledStateGraph, requested: list[Parameter],
                         given_extractions: list[ParameterExtraction]) \
             -> list[ParameterExtraction]:
-        parameters_to_extract = self.get_parameters_to_extract(requested)
-        context = LangGraphManager.Context(parameters_to_extract=parameters_to_extract)
+        parameters_to_extract = await self.get_parameters_to_extract(requested)
+        context = LangGraphManager.Context(query=query, parameters_to_extract=parameters_to_extract)
         initial_state = LangGraphManager.State(extractions=given_extractions)
         state_dict = await graph.ainvoke(initial_state, context=context)
         final_state = LangGraphManager.State.model_validate(state_dict)

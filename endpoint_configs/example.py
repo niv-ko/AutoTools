@@ -8,7 +8,7 @@ example_config = EndpointConfig(
     route=HttpUrl("http://localhost:8000/example"),
     description="An example endpoint that accepts two integers a and b.",
     parameters=[
-        Parameter[int](name='a', description="First integer", required_input=False),
+        Parameter[int](name='a', description="First integer", default=1),
         Parameter[int](name='b', description="Second integer", default=2),
     ]
 )

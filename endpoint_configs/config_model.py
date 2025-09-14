@@ -1,3 +1,4 @@
+import keyword
 import re
 from typing import Type, TypeVar, Generic
 
@@ -95,8 +96,23 @@ class EndpointConfig(BaseModel, Generic[S, T]):
 
 
 def _sanitize(name: str) -> str:
-    # valid Python identifier
-    name2 = re.sub(r'\W|^(?=\d)', '_', name)
-    if name2 == "":
-        name2 = "_"
-    return name2
+    # collapse non-word chars to underscores and trim leading/trailing underscores
+    s = re.sub(r'\W+', '_', name or '').strip('_')
+
+    # fallback if everything was stripped
+    if not s:
+        s = 'f'
+
+    # avoid starting with a digit
+    if s[0].isdigit():
+        s = f"f_{s}"
+
+    # avoid Pydantic's protected namespace
+    if s.startswith('model_'):
+        s = f"f_{s}"
+
+    # avoid Python keywords
+    if keyword.iskeyword(s):
+        s = f"{s}_"
+
+    return s

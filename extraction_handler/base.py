@@ -1,3 +1,5 @@
+from typing import Optional
+
 from endpoint_configs.config_model import EndpointConfig
 from extraction_configs.schema import ExtractionConfig
 from extractor_factory.base import ExtractorFactory
@@ -5,6 +7,7 @@ from parameter_extraction.parameter_extraction import ParameterExtraction
 from abc import ABC, abstractmethod
 
 from parameters.parameter import Parameter
+from selector.base import ParameterSelector
 
 
 class ExtractionHandler(ABC):
@@ -14,6 +17,6 @@ class ExtractionHandler(ABC):
         self.extractor_factory = ExtractorFactory(extraction_config)
 
     @abstractmethod
-    async def extract_parameters(self, parameters: list[Parameter], given_extractions: list[ParameterExtraction]) -> \
-            list[ParameterExtraction]:
+    async def extract_parameters(self, query: str, parameters: list[Parameter],
+                                 given_extractions: list[ParameterExtraction]) -> list[ParameterExtraction]:
         pass

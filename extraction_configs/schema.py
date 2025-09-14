@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, Field, conlist, PrivateAttr
 
 
@@ -19,6 +21,7 @@ class ParameterRequirement(BaseModel):
 class ExtractionConfig(BaseModel):
     parameter_extraction_methods: list[ParameterExtractionMethod]
     parameters_requirements: list[ParameterRequirement] = Field(default_factory=list)
+    filterable_parameters_names: list[str] = Field(default_factory=list)
 
     _method_by_name: dict[str, ExtractionMethod] = PrivateAttr(default_factory=dict)
     _requirements_by_name: dict[str, list[str]] = PrivateAttr(default_factory=dict)
